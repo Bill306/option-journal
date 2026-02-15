@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Trade {
+  id              String   @id @default(uuid())
+  underlying      String
+  strategyType    String   @map("strategy_type")
+  direction       String   // bull / bear / neutral
+  status          String   @default("open") // open / closed
+  entryDatetime   DateTime @map("entry_datetime")
+  exitDatetime    DateTime? @map("exit_datetime")
+  entryPriceTotal Float    @map("entry_price_total") // net credit(+) or debit(-)
+  exitPriceTotal  Float?   @map("exit_price_total")
+  qty             Int      @default(1)
+  fees            Float    @default(0)
+  pnl             Float?
+  maxRisk         Float?   @map("max_risk")
+  thesis          String?
+  setupType       String?  @map("setup_type")
+  ruleCompliant   Boolean  @default(true) @map("rule_compliant")
+  emotionScore    Int?     @map("emotion_score") // 1-5
+  marketTrend     String?  @map("market_trend") // up / down / sideways
+  vixLevel        Float?   @map("vix_level")
+  earningsEvent   Boolean  @default(false) @map("earnings_event")
+  tags            String?  // JSON array stored as string
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  legs  TradeLeg[]
+  notes Note[]
+
+  @@map("trades")
+}
+
+model TradeLeg {
+  id          String   @id @default(uuid())
+  tradeId     String   @map("trade_id")
+  optionType  String   @map("option_type") // call / put
+  side        String   // long / short
+  strike      Float
+  expiration  DateTime
+  contracts   Int      @default(1)
+  entryPrice  Float    @map("entry_price") // per contract
+  exitPrice   Float?   @map("exit_price")
+  deltaEntry  Float?   @map("delta_entry")
+  ivEntry     Float?   @map("iv_entry")
+
+  trade Trade @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+
+  @@map("trade_legs")
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  tradeId   String   @map("trade_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  trade Trade @relation(fields: [tradeId], references: [id], onDelete: Cascade)
+
+  @@map("notes")
+}
+
+model WeeklyReview {
+  id            String   @id @default(uuid())
+  weekStartDate DateTime @unique @map("week_start_date")
+  summaryJson   String   @map("summary_json") // JSON blob
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("weekly_reviews")
+}
+
+model StrategyTemplate {
+  id           String @id @default(uuid())
+  name         String
+  strategyType String @map("strategy_type")
+  defaultLegs  String @map("default_legs") // JSON
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("strategy_templates")
+}
+
+model BucketConfig {
+  id        String @id @default(uuid())
+  category  String // dte / delta / iv_rank
+  buckets   String // JSON array of ranges
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("bucket_configs")
+}
