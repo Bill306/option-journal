@@ -4,6 +4,8 @@
 
 交易结束了，有价值的问题值得留下来。
 
+![本地新建日志，等待添加交易记录](docs/images/preview.png)
+
 一个使用 Next.js、Prisma 和 SQLite 的本地期权交易日志，记录交易与各个期权合约，把投资理由、执行过程和结果放在一起查看。
 
 ## 记录数字，也记录当时的想法
@@ -23,7 +25,7 @@ npm run db:push
 npm run dev -- --hostname 127.0.0.1
 ```
 
-打开 `http://127.0.0.1:3000`。数据库使用 `prisma/dev.db`。可选命令 `npm run db:seed` 会写入仓库示例记录；已有数据时，需要阅读 `prisma/seed.ts` 后再决定使用。
+打开 `http://127.0.0.1:3000`。数据库使用 `prisma/dev.db`。应用从空白日志开始，点击 **New Trade** 创建交易记录。
 
 构建使用 `npm run build`，启动使用 `npm start -- --hostname 127.0.0.1`。当前数据模型没有多用户账号隔离，应在自己的电脑使用；公开部署需要相应访问控制。
 

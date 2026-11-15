@@ -81,33 +81,33 @@ export default function NewTradePage() {
 
     const payload = {
       underlying: underlying.toUpperCase().trim(),
-      strategy_type: strategyType,
+      strategyType,
       direction,
-      entry_date: entryDate,
-      entry_price_total: parseFloat(entryPriceTotal),
-      quantity: parseInt(quantity, 10),
+      entryDatetime: new Date(entryDate).toISOString(),
+      entryPriceTotal: parseFloat(entryPriceTotal),
+      qty: parseInt(quantity, 10),
       fees: parseFloat(fees) || 0,
-      max_risk: maxRisk ? parseFloat(maxRisk) : null,
-      setup_type: setupType || null,
+      maxRisk: maxRisk ? parseFloat(maxRisk) : null,
+      setupType: setupType || null,
       thesis: thesis.trim() || null,
-      rule_compliant: ruleCompliant,
-      emotion_score: emotionScore ? parseInt(emotionScore, 10) : null,
-      market_trend: marketTrend || null,
-      vix_level: vixLevel ? parseFloat(vixLevel) : null,
-      earnings_event: earningsEvent,
+      ruleCompliant,
+      emotionScore: emotionScore ? parseInt(emotionScore, 10) : null,
+      marketTrend: marketTrend || null,
+      vixLevel: vixLevel ? parseFloat(vixLevel) : null,
+      earningsEvent,
       tags: tags
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
       legs: legs.map((leg) => ({
-        option_type: leg.option_type,
+        optionType: leg.option_type,
         side: leg.side,
         strike: parseFloat(leg.strike),
         expiration: leg.expiration,
         contracts: parseInt(leg.contracts, 10),
-        entry_price: parseFloat(leg.entry_price),
-        delta_entry: leg.delta_entry ? parseFloat(leg.delta_entry) : null,
-        iv_entry: leg.iv_entry ? parseFloat(leg.iv_entry) : null,
+        entryPrice: parseFloat(leg.entry_price),
+        deltaEntry: leg.delta_entry ? parseFloat(leg.delta_entry) : null,
+        ivEntry: leg.iv_entry ? parseFloat(leg.iv_entry) : null,
       })),
     };
 

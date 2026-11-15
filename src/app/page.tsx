@@ -19,11 +19,11 @@ import { Loading } from "@/components/ui/loading";
 interface Trade {
   id: string;
   underlying: string;
-  strategy: string;
+  strategyType: string;
   direction: string;
-  entryDate: string;
-  entryPrice: number;
-  maxRisk: number;
+  entryDatetime: string;
+  entryPriceTotal: number;
+  maxRisk: number | null;
   status: string;
   pnl?: number;
 }
@@ -35,12 +35,13 @@ interface EquityPoint {
 }
 
 interface Analytics {
-  winRate: number;
-  expectancy: number;
-  profitFactor: number;
-  maxDrawdown: number;
+  overview: {
+    winRate: number;
+    expectancy: number;
+    profitFactor: number | null;
+    maxDrawdown: number;
+  };
   equityCurve: EquityPoint[];
-  strategyEdge: Array<{ strategy: string; edge: number }>;
 }
 
 export default function DashboardPage() {
@@ -58,7 +59,7 @@ export default function DashboardPage() {
 
         if (tradesRes.ok) {
           const tradesData = await tradesRes.json();
-          setTrades(tradesData.trades || []);
+          setTrades(tradesData);
         }
 
         if (analyticsRes.ok) {
@@ -107,25 +108,25 @@ export default function DashboardPage() {
         />
         <MetricCard
           title="Win Rate"
-          value={analytics ? formatPercent(analytics.winRate) : "--"}
+          value={analytics ? formatPercent(analytics.overview.winRate) : "--"}
           subtitle={
             analytics
-              ? `${Math.round((analytics.winRate / 100) * trades.filter((t) => t.status === "closed").length)}W / ${trades.filter((t) => t.status === "closed").length - Math.round((analytics.winRate / 100) * trades.filter((t) => t.status === "closed").length)}L`
+              ? `${trades.filter((t) => t.status === "closed" && (t.pnl ?? 0) > 0).length} wins / ${trades.filter((t) => t.status === "closed").length} closed`
               : undefined
           }
         />
         <MetricCard
           title="Expectancy"
-          value={analytics ? formatCurrency(analytics.expectancy) : "--"}
+          value={analytics ? formatCurrency(analytics.overview.expectancy) : "--"}
           subtitle="Per trade avg"
           isPnl
-          numericValue={analytics?.expectancy}
+          numericValue={analytics?.overview.expectancy}
         />
         <MetricCard
           title="Profit Factor"
-          value={analytics ? analytics.profitFactor.toFixed(2) : "--"}
+          value={analytics ? (analytics.overview.profitFactor === null ? "∞" : analytics.overview.profitFactor.toFixed(2)) : "--"}
           subtitle={
-            analytics && analytics.profitFactor >= 1.5
+            analytics && (analytics.overview.profitFactor === null || analytics.overview.profitFactor >= 1.5)
               ? "Above target"
               : analytics
                 ? "Below target"
@@ -206,12 +207,12 @@ export default function DashboardPage() {
             </h2>
             <div className="text-2xl font-bold text-loss">
               {analytics
-                ? formatCurrency(-Math.abs(analytics.maxDrawdown))
+                ? formatPercent(analytics.overview.maxDrawdown)
                 : "--"}
             </div>
             {analytics && (
               <p className="text-xs text-gray-400 mt-1">
-                {formatPercent(analytics.maxDrawdown)} of peak
+                Of cumulative profit peak
               </p>
             )}
           </div>
@@ -220,7 +221,7 @@ export default function DashboardPage() {
               <div
                 className="bg-loss rounded-full h-2 transition-all"
                 style={{
-                  width: `${analytics ? Math.min(analytics.maxDrawdown, 100) : 0}%`,
+                  width: `${analytics ? Math.min(analytics.overview.maxDrawdown, 100) : 0}%`,
                 }}
               />
             </div>
@@ -275,7 +276,7 @@ export default function DashboardPage() {
                       {trade.underlying}
                     </td>
                     <td className="py-2 px-3 text-gray-600">
-                      {STRATEGY_LABELS[trade.strategy] || trade.strategy}
+                      {STRATEGY_LABELS[trade.strategyType] || trade.strategyType}
                     </td>
                     <td className="py-2 px-3">
                       <span
@@ -292,13 +293,13 @@ export default function DashboardPage() {
                       </span>
                     </td>
                     <td className="py-2 px-3 text-gray-600">
-                      {formatDate(trade.entryDate)}
+                      {formatDate(trade.entryDatetime)}
                     </td>
                     <td className="py-2 px-3 text-right text-gray-600">
-                      ${trade.entryPrice.toFixed(2)}
+                      {formatCurrency(trade.entryPriceTotal)}
                     </td>
                     <td className="py-2 px-3 text-right text-loss font-medium">
-                      ${trade.maxRisk.toFixed(2)}
+                      {trade.maxRisk === null ? "—" : formatCurrency(trade.maxRisk)}
                     </td>
                   </tr>
                 ))}

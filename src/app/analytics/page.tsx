@@ -39,7 +39,7 @@ interface AnalyticsData {
     openTrades: number;
     winRate: number;
     expectancy: number;
-    profitFactor: number;
+    profitFactor: number | null;
     maxDrawdown: number;
   };
   equityCurve: EquityPoint[];
@@ -470,7 +470,7 @@ function OverviewHeader({ overview }: { overview: AnalyticsData["overview"] }) {
       <div className="card">
         <div className="card-header">Profit Factor</div>
         <div className="card-value">
-          {overview.profitFactor === Infinity
+          {overview.profitFactor === null
             ? "\u221E"
             : overview.profitFactor.toFixed(2)}
         </div>

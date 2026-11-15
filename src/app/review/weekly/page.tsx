@@ -33,7 +33,7 @@ interface WeeklyReviewSummary {
   totalPnl: number;
   winRate: number;
   expectancy: number;
-  profitFactor: number;
+  profitFactor: number | null;
   bestStrategy: StrategyResult | null;
   worstStrategy: StrategyResult | null;
   complianceComparison: BucketResult[];
@@ -184,9 +184,9 @@ export default function WeeklyReviewPage() {
             />
             <MetricCard
               title="Profit Factor"
-              value={review.profitFactor.toFixed(2)}
+              value={review.profitFactor === null ? "∞" : review.profitFactor.toFixed(2)}
               subtitle={
-                review.profitFactor >= 1.5 ? "Above target" : "Below target"
+                review.profitFactor === null || review.profitFactor >= 1.5 ? "Above target" : "Below target"
               }
             />
           </div>

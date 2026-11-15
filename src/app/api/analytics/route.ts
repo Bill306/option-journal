@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+export const dynamic = "force-dynamic";
 import {
   calcWinRate,
   calcExpectancy,
@@ -73,9 +74,9 @@ export async function GET() {
         totalTrades: trades.length,
         closedTrades: trades.filter((t) => t.status === "closed").length,
         openTrades: trades.filter((t) => t.status === "open").length,
-        winRate,
+        winRate: winRate * 100,
         expectancy,
-        profitFactor,
+        profitFactor: Number.isFinite(profitFactor) ? profitFactor : null,
         maxDrawdown,
       },
       equityCurve,

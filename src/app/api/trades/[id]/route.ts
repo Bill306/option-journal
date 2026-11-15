@@ -1,6 +1,22 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const { content } = await request.json();
+  if (typeof content !== "string" || !content.trim()) {
+    return NextResponse.json({ error: "Note content is required" }, { status: 400 });
+  }
+  const trade = await prisma.trade.findUnique({ where: { id: params.id } });
+  if (!trade) {
+    return NextResponse.json({ error: "Trade not found" }, { status: 404 });
+  }
+  const note = await prisma.note.create({ data: { tradeId: trade.id, content: content.trim() } });
+  return NextResponse.json(note, { status: 201 });
+}
+
 // ============================================================
 // GET /api/trades/[id] — Fetch a single trade with legs & notes
 // ============================================================

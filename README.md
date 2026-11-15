@@ -4,6 +4,8 @@
 
 The trade ends. The useful questions should stay around.
 
+![A fresh local journal, ready for its first trade](docs/images/preview.png)
+
 A local options-trading journal built with Next.js, Prisma, and SQLite. It records trades and individual option legs, preserves thesis and process notes, and organizes dashboard statistics and weekly reviews.
 
 ## Keep the decision with the numbers
@@ -23,7 +25,7 @@ npm run db:push
 npm run dev -- --hostname 127.0.0.1
 ```
 
-Open `http://127.0.0.1:3000`. The Prisma datasource is SQLite at `prisma/dev.db`. `npm run db:seed` is optional and inserts the repository's seed records; inspect `prisma/seed.ts` before using it with existing data.
+Open `http://127.0.0.1:3000`. The Prisma datasource is SQLite at `prisma/dev.db`. The application starts with an empty journal; create your first trade through **New Trade**.
 
 For a production build, use `npm run build` and `npm start -- --hostname 127.0.0.1`. This local application has no account isolation in its data model; keep it on your own machine until appropriate access controls are provided.
 

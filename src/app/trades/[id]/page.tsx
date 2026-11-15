@@ -206,20 +206,16 @@ export default function TradeDetailPage() {
     if (!newNote.trim() || !trade) return;
     setAddingNote(true);
     try {
-      const res = await fetch("/api/trades", {
+      const res = await fetch(`/api/trades/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          tradeId: trade.id,
-          note: newNote.trim(),
+          content: newNote.trim(),
         }),
       });
 
-      // If a dedicated notes endpoint exists the POST would go there.
-      // Fallback: re-fetch the trade to pick up any server-side note creation.
-      if (res.ok) {
-        setNewNote("");
-      }
+      if (!res.ok) throw new Error("Failed to save note");
+      setNewNote("");
 
       // Refresh the trade to get updated notes
       const tradeRes = await fetch(`/api/trades/${id}`);
@@ -227,8 +223,8 @@ export default function TradeDetailPage() {
         const updated: Trade = await tradeRes.json();
         setTrade(updated);
       }
-    } catch {
-      // Silently handle — note was best-effort
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to save note");
     } finally {
       setAddingNote(false);
     }
